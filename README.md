@@ -1,32 +1,44 @@
+# Mapa da Carreira - Site HTML Interativo
 
-# Roda da Carreira - Aplicativo de Análise Profissional
+Ferramenta mobile-first para diagnóstico de carreira inspirada na Roda da Vida, com cálculo de gap entre estado atual e desejado e plano de ação simples (SMART + 5W2H).
 
-Este é um aplicativo interativo para análise e desenvolvimento de carreira, baseado no conceito da Roda da Carreira.
+## Testar agora (em 1 minuto)
 
-## Instalação
+### Opção 1: abrir direto
+Abra `index.html` no navegador.
 
-1. Clone este repositório
-2. Instale as dependências:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Execução
-
-Para executar o aplicativo:
+### Opção 2: servidor local (recomendado)
 ```bash
-streamlit run app.py
+python -m http.server 8000
 ```
+Depois acesse `http://localhost:8000/index.html`.
 
-## Funcionalidades
+## Como usar
 
-- Avaliação de 9 dimensões profissionais
-- Visualização em gráfico radar
-- Análise detalhada de gaps
-- Plano de desenvolvimento personalizado
-- Exportação de resultados
+1. Preencha cargo atual e cargo desejado.
+2. Ajuste as notas de 0 a 10 para cada dimensão.
+3. Veja a roda da carreira (radar), tabela de gaps e prioridades.
+4. Use o plano automático SMART + 5W2H.
+5. Clique em **Exportar plano (JSON)** para salvar.
 
-## Requisitos do Sistema
+## Dimensões incluídas (13)
 
-- Python 3.7+
-- Navegador web moderno
+- Desenvolvimento Profissional
+- Satisfação no Trabalho
+- Equilíbrio entre Trabalho e Vida Pessoal
+- Reconhecimento e Recompensa
+- Perspectivas de Carreira
+- Relacionamentos Profissionais
+- Autonomia e Controle
+- Alinhamento com Valores Pessoais
+- Estabilidade e Segurança
+- Impacto e Contribuição
+- Habilidades de Comunicação
+- Criatividade e Inovação
+- Bem-Estar e Saúde no Trabalho
+
+## Stack e custo
+
+- HTML/CSS/JavaScript puro (sem backend obrigatório)
+- Sem dependências de build
+- Hospedagem gratuita: GitHub Pages, Netlify ou Vercel

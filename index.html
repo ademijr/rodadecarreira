@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapa da Carreira - Roda da Carreira</title>
+  <style>
+    :root { --bg:#f5f7fb; --card:#fff; --text:#1f2937; --muted:#6b7280; --primary:#2563eb; --shadow:0 10px 25px rgba(0,0,0,.08); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    body { margin:0; background:var(--bg); color:var(--text); }
+    .container { max-width:1120px; margin:0 auto; padding:1rem; }
+    .hero,.card { background:var(--card); border-radius:16px; box-shadow:var(--shadow); margin-bottom:1rem; padding:1rem; }
+    h1,h2,h3 { margin:.3rem 0 .8rem; } .sub,.small{ color:var(--muted); line-height:1.4; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px; }
+    .field { display:grid; gap:6px; border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fcfdff; }
+    .field label{ font-weight:600; font-size:.95rem; }
+    .sliders{ display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:center; }
+    .sliders span{ font-size:.85rem; color:var(--muted); }
+    input[type="range"]{ width:100%; }
+    .toolbar{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    button{ border:none; border-radius:12px; padding:10px 14px; background:var(--primary); color:#fff; font-weight:600; cursor:pointer; }
+    button.secondary{ background:#e5e7eb; color:#111827; }
+    table{ width:100%; border-collapse:collapse; font-size:.92rem; } th,td{ border-bottom:1px solid #e5e7eb; text-align:left; padding:8px; vertical-align:top; }
+    .badge{ display:inline-block; font-weight:700; padding:2px 8px; border-radius:999px; font-size:.85rem; margin-left:4px; }
+    .gap-high{ background:#fee2e2; color:#991b1b; } .gap-mid{ background:#fef3c7; color:#92400e; } .gap-low{ background:#dcfce7; color:#166534; }
+    #radarChart{ width:100%; max-width:700px; height:420px; display:block; margin:0 auto; }
+    @media (max-width: 600px){ #radarChart{ height:360px; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>🎯 Mapa da Carreira (Roda da Carreira)</h1>
+      <p class="sub">Ferramenta para celular e desktop baseada na Roda da Vida + metas SMART + plano 5W2H. Avalie estado atual e desejado (0 a 10), veja o gap e execute seu plano.</p>
+      <div class="grid">
+        <div class="field"><label for="cargoAtual">Cargo atual</label><input id="cargoAtual" type="text" placeholder="Ex.: Analista de Marketing" /></div>
+        <div class="field"><label for="cargoDesejado">Cargo desejado</label><input id="cargoDesejado" type="text" placeholder="Ex.: Gerente de Marketing" /></div>
+      </div>
+      <div class="toolbar"><button id="btnExportar">Exportar plano (JSON)</button><button id="btnResetar" class="secondary">Restaurar valores iniciais</button></div>
+    </section>
+
+    <section class="card"><h2>1) Diagnóstico das dimensões</h2><p class="small">Use os controles para registrar como está hoje e onde quer chegar.</p><div id="dimensoes" class="grid"></div></section>
+    <section class="card"><h2>2) Visualização da Roda da Carreira</h2><canvas id="radarChart" width="700" height="420" aria-label="Gráfico radar da carreira"></canvas></section>
+    <section class="card"><h2>3) Gaps e prioridades</h2><table id="tabelaGaps"><thead><tr><th>Dimensão</th><th>Atual</th><th>Desejado</th><th>Gap</th><th>Prioridade</th></tr></thead><tbody></tbody></table></section>
+    <section class="card"><h2>4) Plano de ação (SMART + 5W2H)</h2><p class="small">Abaixo aparecem as 3 maiores prioridades automaticamente.</p><div id="planoAcao"></div></section>
+  </div>
+
+  <script>
+    const dimensoesBase = [
+      { nome: "Desenvolvimento Profissional", atual: 6, desejado: 9 },
+      { nome: "Satisfação no Trabalho", atual: 5, desejado: 8 },
+      { nome: "Equilíbrio entre Trabalho e Vida Pessoal", atual: 4, desejado: 7 },
+      { nome: "Reconhecimento e Recompensa", atual: 3, desejado: 8 },
+      { nome: "Perspectivas de Carreira", atual: 5, desejado: 9 },
+      { nome: "Relacionamentos Profissionais", atual: 7, desejado: 9 },
+      { nome: "Autonomia e Controle", atual: 6, desejado: 9 },
+      { nome: "Alinhamento com Valores Pessoais", atual: 5, desejado: 8 },
+      { nome: "Estabilidade e Segurança", atual: 8, desejado: 9 },
+      { nome: "Impacto e Contribuição", atual: 4, desejado: 9 },
+      { nome: "Habilidades de Comunicação", atual: 6, desejado: 8 },
+      { nome: "Criatividade e Inovação", atual: 5, desejado: 8 },
+      { nome: "Bem-Estar e Saúde no Trabalho", atual: 4, desejado: 7 }
+    ];
+
+    let dimensoes = JSON.parse(JSON.stringify(dimensoesBase));
+    const dimensoesEl = document.getElementById("dimensoes");
+    const tabelaBody = document.querySelector("#tabelaGaps tbody");
+    const planoEl = document.getElementById("planoAcao");
+
+    function classeGap(gap){ if(gap >= 4) return ["Alta","gap-high"]; if(gap >= 2) return ["Média","gap-mid"]; return ["Baixa","gap-low"]; }
+
+    function montarInputs(){
+      dimensoesEl.innerHTML = "";
+      dimensoes.forEach((dim,i)=>{
+        const field = document.createElement("div");
+        field.className = "field";
+        field.innerHTML = `<label>${dim.nome}</label><div class="sliders"><div><span>Atual: <strong id="atualVal${i}">${dim.atual}</strong></span><input type="range" min="0" max="10" step="1" value="${dim.atual}" id="atual${i}" /></div><div><span>Desejado: <strong id="desVal${i}">${dim.desejado}</strong></span><input type="range" min="0" max="10" step="1" value="${dim.desejado}" id="des${i}" /></div></div>`;
+        dimensoesEl.appendChild(field);
+        field.querySelector(`#atual${i}`).addEventListener("input", (e)=>{ dimensoes[i].atual = Number(e.target.value); field.querySelector(`#atualVal${i}`).textContent = e.target.value; atualizarTudo(); });
+        field.querySelector(`#des${i}`).addEventListener("input", (e)=>{ dimensoes[i].desejado = Number(e.target.value); field.querySelector(`#desVal${i}`).textContent = e.target.value; atualizarTudo(); });
+      });
+    }
+
+    function drawRadar(){
+      const canvas = document.getElementById("radarChart");
+      const ctx = canvas.getContext("2d");
+      const {width, height} = canvas;
+      ctx.clearRect(0,0,width,height);
+
+      const cx = width/2, cy = height/2, maxR = Math.min(width, height)*0.35;
+      const n = dimensoes.length;
+      const angleStep = (Math.PI*2)/n;
+
+      // grade
+      ctx.strokeStyle = "#d1d5db";
+      for(let level=1; level<=5; level++){
+        const r = (maxR/5)*level;
+        ctx.beginPath();
+        for(let i=0;i<n;i++){
+          const ang = -Math.PI/2 + i*angleStep;
+          const x = cx + Math.cos(ang)*r;
+          const y = cy + Math.sin(ang)*r;
+          i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
+
+      // eixos + labels
+      ctx.font = "11px sans-serif";
+      ctx.fillStyle = "#374151";
+      dimensoes.forEach((d,i)=>{
+        const ang = -Math.PI/2 + i*angleStep;
+        const x = cx + Math.cos(ang)*maxR;
+        const y = cy + Math.sin(ang)*maxR;
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
+
+        const lx = cx + Math.cos(ang)*(maxR+18);
+        const ly = cy + Math.sin(ang)*(maxR+18);
+        const label = d.nome.length > 22 ? d.nome.slice(0,22)+"…" : d.nome;
+        ctx.fillText(label, lx-30, ly);
+      });
+
+      function plot(data, stroke, fill){
+        ctx.beginPath();
+        data.forEach((v,i)=>{
+          const ang = -Math.PI/2 + i*angleStep;
+          const r = (v/10)*maxR;
+          const x = cx + Math.cos(ang)*r;
+          const y = cy + Math.sin(ang)*r;
+          i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+        });
+        ctx.closePath();
+        ctx.strokeStyle = stroke; ctx.fillStyle = fill; ctx.lineWidth = 2; ctx.stroke(); ctx.fill();
+      }
+      plot(dimensoes.map(d=>d.atual), "#2563eb", "rgba(37,99,235,.2)");
+      plot(dimensoes.map(d=>d.desejado), "#059669", "rgba(5,150,105,.2)");
+
+      // legenda
+      ctx.fillStyle="#2563eb"; ctx.fillRect(20,20,12,12); ctx.fillStyle="#111827"; ctx.fillText("Estado Atual", 38, 30);
+      ctx.fillStyle="#059669"; ctx.fillRect(140,20,12,12); ctx.fillStyle="#111827"; ctx.fillText("Estado Desejado", 158, 30);
+    }
+
+    function montarTabelaGaps(){
+      tabelaBody.innerHTML="";
+      const ordenado=[...dimensoes].map(d=>({...d,gap:Math.max(0,d.desejado-d.atual)})).sort((a,b)=>b.gap-a.gap);
+      ordenado.forEach(item=>{
+        const [txt, cls] = classeGap(item.gap);
+        const tr=document.createElement("tr");
+        tr.innerHTML=`<td>${item.nome}</td><td>${item.atual}</td><td>${item.desejado}</td><td>${item.gap}</td><td><span class="badge ${cls}">${txt}</span></td>`;
+        tabelaBody.appendChild(tr);
+      });
+      return ordenado;
+    }
+
+    function montarPlanoAcao(top3){
+      planoEl.innerHTML="";
+      const cargoAtual=document.getElementById("cargoAtual").value || "Cargo atual não informado";
+      const cargoDesejado=document.getElementById("cargoDesejado").value || "Cargo desejado não informado";
+      const ativos = top3.filter(d=>d.gap>0);
+      if(!ativos.length){ planoEl.innerHTML = '<p class="small">Parabéns! Não há gap positivo no momento. Mantenha rotina mensal de revisão.</p>'; return; }
+      ativos.forEach((d,index)=>{
+        const bloco=document.createElement("div");
+        bloco.className="field";
+        bloco.innerHTML=`<h3>${index+1}. ${d.nome} (Gap ${d.gap})</h3><p><strong>Meta SMART:</strong> Em 90 dias, elevar <em>${d.nome}</em> de ${d.atual} para ao menos ${Math.min(d.atual+2,d.desejado)} com evidências objetivas.</p><p><strong>5W2H:</strong><br><strong>What:</strong> Executar 2 ações semanais ligadas à dimensão.<br><strong>Why:</strong> Reduzir distância entre ${cargoAtual} e ${cargoDesejado}.<br><strong>Where:</strong> Trabalho atual + networking + cursos online.<br><strong>When:</strong> Revisão semanal e checkpoint mensal.<br><strong>Who:</strong> Você + mentor(a)/líder + parceiro de responsabilização.<br><strong>How:</strong> Microtarefas de 30-45 min registradas no calendário.<br><strong>How much:</strong> Recursos gratuitos ou até R$150/mês.</p>`;
+        planoEl.appendChild(bloco);
+      });
+    }
+
+    function atualizarTudo(){ drawRadar(); const ordenado=montarTabelaGaps(); montarPlanoAcao(ordenado.slice(0,3)); }
+
+    document.getElementById("btnResetar").addEventListener("click", ()=>{ dimensoes=JSON.parse(JSON.stringify(dimensoesBase)); montarInputs(); atualizarTudo(); });
+    document.getElementById("btnExportar").addEventListener("click", ()=>{
+      const payload={ cargoAtual:document.getElementById("cargoAtual").value, cargoDesejado:document.getElementById("cargoDesejado").value, dimensoes:dimensoes.map(d=>({...d,gap:Math.max(0,d.desejado-d.atual)})), geradoEm:new Date().toISOString() };
+      const blob=new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
+      const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="plano_carreira.json"; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    montarInputs();
+    atualizarTudo();
+  </script>
+</body>
+</html>
