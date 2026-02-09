@@ -1,32 +1,32 @@
+# Mapa da Carreira - Site HTML Interativo
 
-# Roda da Carreira - Aplicativo de Análise Profissional
+Ferramenta mobile-first para diagnóstico de carreira (Roda da Vida aplicada à carreira), com gap entre estado atual e desejado, plano SMART + 5W2H e ações detalhadas por transição de cargo.
 
-Este é um aplicativo interativo para análise e desenvolvimento de carreira, baseado no conceito da Roda da Carreira.
+## Testar agora
 
-## Instalação
+### Opção 1 (rápida)
+Abra `index.html` no navegador.
 
-1. Clone este repositório
-2. Instale as dependências:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Execução
-
-Para executar o aplicativo:
+### Opção 2 (recomendada)
 ```bash
-streamlit run app.py
+python -m http.server 8000
 ```
+Acesse: `http://localhost:8000/index.html`
 
 ## Funcionalidades
 
-- Avaliação de 9 dimensões profissionais
-- Visualização em gráfico radar
-- Análise detalhada de gaps
-- Plano de desenvolvimento personalizado
-- Exportação de resultados
+- 13 dimensões com nota de 0 a 10 (Atual vs Desejado)
+- Roda da Carreira (gráfico radar em canvas nativo)
+- Cálculo de gap e prioridades
+- Plano detalhado por cargo atual → cargo desejado
+- Pesquisa guiada de mercado com links úteis
+- Exportação em:
+  - JSON
+  - CSV (editável no Excel/Google Sheets)
+  - PDF (via impressão do navegador)
 
-## Requisitos do Sistema
+## Stack e custo
 
-- Python 3.7+
-- Navegador web moderno
+- HTML/CSS/JavaScript puro
+- Sem backend obrigatório
+- Pode publicar gratuitamente em GitHub Pages, Netlify ou Vercel
