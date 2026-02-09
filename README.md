@@ -1,44 +1,32 @@
 # Mapa da Carreira - Site HTML Interativo
 
-Ferramenta mobile-first para diagnóstico de carreira inspirada na Roda da Vida, com cálculo de gap entre estado atual e desejado e plano de ação simples (SMART + 5W2H).
+Ferramenta mobile-first para diagnóstico de carreira (Roda da Vida aplicada à carreira), com gap entre estado atual e desejado, plano SMART + 5W2H e ações detalhadas por transição de cargo.
 
-## Testar agora (em 1 minuto)
+## Testar agora
 
-### Opção 1: abrir direto
+### Opção 1 (rápida)
 Abra `index.html` no navegador.
 
-### Opção 2: servidor local (recomendado)
+### Opção 2 (recomendada)
 ```bash
 python -m http.server 8000
 ```
-Depois acesse `http://localhost:8000/index.html`.
+Acesse: `http://localhost:8000/index.html`
 
-## Como usar
+## Funcionalidades
 
-1. Preencha cargo atual e cargo desejado.
-2. Ajuste as notas de 0 a 10 para cada dimensão.
-3. Veja a roda da carreira (radar), tabela de gaps e prioridades.
-4. Use o plano automático SMART + 5W2H.
-5. Clique em **Exportar plano (JSON)** para salvar.
-
-## Dimensões incluídas (13)
-
-- Desenvolvimento Profissional
-- Satisfação no Trabalho
-- Equilíbrio entre Trabalho e Vida Pessoal
-- Reconhecimento e Recompensa
-- Perspectivas de Carreira
-- Relacionamentos Profissionais
-- Autonomia e Controle
-- Alinhamento com Valores Pessoais
-- Estabilidade e Segurança
-- Impacto e Contribuição
-- Habilidades de Comunicação
-- Criatividade e Inovação
-- Bem-Estar e Saúde no Trabalho
+- 13 dimensões com nota de 0 a 10 (Atual vs Desejado)
+- Roda da Carreira (gráfico radar em canvas nativo)
+- Cálculo de gap e prioridades
+- Plano detalhado por cargo atual → cargo desejado
+- Pesquisa guiada de mercado com links úteis
+- Exportação em:
+  - JSON
+  - CSV (editável no Excel/Google Sheets)
+  - PDF (via impressão do navegador)
 
 ## Stack e custo
 
-- HTML/CSS/JavaScript puro (sem backend obrigatório)
-- Sem dependências de build
-- Hospedagem gratuita: GitHub Pages, Netlify ou Vercel
+- HTML/CSS/JavaScript puro
+- Sem backend obrigatório
+- Pode publicar gratuitamente em GitHub Pages, Netlify ou Vercel

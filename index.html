@@ -5,43 +5,120 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mapa da Carreira - Roda da Carreira</title>
   <style>
-    :root { --bg:#f5f7fb; --card:#fff; --text:#1f2937; --muted:#6b7280; --primary:#2563eb; --shadow:0 10px 25px rgba(0,0,0,.08); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
-    body { margin:0; background:var(--bg); color:var(--text); }
-    .container { max-width:1120px; margin:0 auto; padding:1rem; }
-    .hero,.card { background:var(--card); border-radius:16px; box-shadow:var(--shadow); margin-bottom:1rem; padding:1rem; }
-    h1,h2,h3 { margin:.3rem 0 .8rem; } .sub,.small{ color:var(--muted); line-height:1.4; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px; }
-    .field { display:grid; gap:6px; border:1px solid #e5e7eb; border-radius:12px; padding:12px; background:#fcfdff; }
-    .field label{ font-weight:600; font-size:.95rem; }
-    .sliders{ display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:center; }
-    .sliders span{ font-size:.85rem; color:var(--muted); }
-    input[type="range"]{ width:100%; }
-    .toolbar{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-    button{ border:none; border-radius:12px; padding:10px 14px; background:var(--primary); color:#fff; font-weight:600; cursor:pointer; }
-    button.secondary{ background:#e5e7eb; color:#111827; }
-    table{ width:100%; border-collapse:collapse; font-size:.92rem; } th,td{ border-bottom:1px solid #e5e7eb; text-align:left; padding:8px; vertical-align:top; }
-    .badge{ display:inline-block; font-weight:700; padding:2px 8px; border-radius:999px; font-size:.85rem; margin-left:4px; }
-    .gap-high{ background:#fee2e2; color:#991b1b; } .gap-mid{ background:#fef3c7; color:#92400e; } .gap-low{ background:#dcfce7; color:#166534; }
-    #radarChart{ width:100%; max-width:700px; height:420px; display:block; margin:0 auto; }
-    @media (max-width: 600px){ #radarChart{ height:360px; } }
+    :root {
+      --bg: #f3f4f6;
+      --card: #fff;
+      --text: #111827;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --secondary: #e5e7eb;
+      --border: #d1d5db;
+      --high: #fee2e2;
+      --mid: #fef3c7;
+      --low: #dcfce7;
+      --shadow: 0 10px 24px rgba(0, 0, 0, .08);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    .container { max-width: 1150px; margin: 0 auto; padding: 1rem; }
+    .hero, .card { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); margin-bottom: 1rem; padding: 1rem; }
+    h1, h2, h3, h4 { margin: .35rem 0 .8rem; }
+    .sub, .small { color: var(--muted); line-height: 1.5; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+    .field { border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: #fcfdff; display: grid; gap: 8px; }
+    .field label { font-weight: 600; }
+    .sliders { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .sliders span { font-size: .88rem; color: var(--muted); }
+    input[type="range"], input[type="text"] { width: 100%; }
+    input[type="text"] { border: 1px solid var(--border); border-radius: 8px; padding: 9px; }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    button {
+      border: none; border-radius: 10px; padding: 10px 14px;
+      font-weight: 700; cursor: pointer; background: var(--primary); color: #fff;
+    }
+    button.secondary { background: var(--secondary); color: #111827; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .94rem; }
+    th, td { border-bottom: 1px solid var(--border); text-align: left; padding: 8px; vertical-align: top; }
+
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-weight: 700; font-size: .82rem; }
+    .gap-high { background: var(--high); color: #991b1b; }
+    .gap-mid { background: var(--mid); color: #92400e; }
+    .gap-low { background: var(--low); color: #166534; }
+
+    #radarChart { width: 100%; max-width: 760px; height: 430px; display: block; margin: 0 auto; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+
+    .plan-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; background: #fff; }
+    .plan-card h3 { margin-top: 0; }
+    .plan-meta { display: grid; gap: 6px; margin: 8px 0; }
+    .plan-block { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px; margin-top: 8px; }
+    ul { margin: 6px 0 0 16px; }
+    .links a { display: inline-block; margin: 4px 8px 0 0; font-size: .88rem; }
+
+    @media (max-width: 640px) {
+      #radarChart { height: 360px; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .toolbar, #btnExportar, #btnExportarCSV, #btnExportarPDF, #btnResetar { display: none !important; }
+      .hero, .card { box-shadow: none; border: 1px solid #ddd; }
+      #radarChart { border: 1px solid #ddd; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <section class="hero">
       <h1>🎯 Mapa da Carreira (Roda da Carreira)</h1>
-      <p class="sub">Ferramenta para celular e desktop baseada na Roda da Vida + metas SMART + plano 5W2H. Avalie estado atual e desejado (0 a 10), veja o gap e execute seu plano.</p>
+      <p class="sub">Diagnóstico com escala 0–10 + plano detalhado por transição de carreira (cargo atual → cargo desejado), com metas SMART e 5W2H.</p>
+
       <div class="grid">
-        <div class="field"><label for="cargoAtual">Cargo atual</label><input id="cargoAtual" type="text" placeholder="Ex.: Analista de Marketing" /></div>
-        <div class="field"><label for="cargoDesejado">Cargo desejado</label><input id="cargoDesejado" type="text" placeholder="Ex.: Gerente de Marketing" /></div>
+        <div class="field">
+          <label for="cargoAtual">Cargo atual</label>
+          <input id="cargoAtual" type="text" placeholder="Ex.: Analista de RH Júnior" />
+        </div>
+        <div class="field">
+          <label for="cargoDesejado">Cargo desejado</label>
+          <input id="cargoDesejado" type="text" placeholder="Ex.: Coordenador de RH" />
+        </div>
       </div>
-      <div class="toolbar"><button id="btnExportar">Exportar plano (JSON)</button><button id="btnResetar" class="secondary">Restaurar valores iniciais</button></div>
+
+      <div class="toolbar">
+        <button id="btnExportar">Exportar JSON</button>
+        <button id="btnExportarCSV">Exportar CSV (Excel)</button>
+        <button id="btnExportarPDF">Exportar PDF</button>
+        <button id="btnResetar" class="secondary">Restaurar valores iniciais</button>
+      </div>
     </section>
 
-    <section class="card"><h2>1) Diagnóstico das dimensões</h2><p class="small">Use os controles para registrar como está hoje e onde quer chegar.</p><div id="dimensoes" class="grid"></div></section>
-    <section class="card"><h2>2) Visualização da Roda da Carreira</h2><canvas id="radarChart" width="700" height="420" aria-label="Gráfico radar da carreira"></canvas></section>
-    <section class="card"><h2>3) Gaps e prioridades</h2><table id="tabelaGaps"><thead><tr><th>Dimensão</th><th>Atual</th><th>Desejado</th><th>Gap</th><th>Prioridade</th></tr></thead><tbody></tbody></table></section>
-    <section class="card"><h2>4) Plano de ação (SMART + 5W2H)</h2><p class="small">Abaixo aparecem as 3 maiores prioridades automaticamente.</p><div id="planoAcao"></div></section>
+    <section class="card">
+      <h2>1) Diagnóstico das dimensões</h2>
+      <p class="small">Ajuste seu estado atual e desejado em cada dimensão.</p>
+      <div id="dimensoes" class="grid"></div>
+    </section>
+
+    <section class="card">
+      <h2>2) Visualização da roda</h2>
+      <canvas id="radarChart" width="760" height="430" aria-label="Radar da carreira"></canvas>
+    </section>
+
+    <section class="card">
+      <h2>3) Gaps e prioridades</h2>
+      <table id="tabelaGaps">
+        <thead><tr><th>Dimensão</th><th>Atual</th><th>Desejado</th><th>Gap</th><th>Prioridade</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>4) Plano de ação detalhado por transição de cargo</h2>
+      <p class="small">Plano construído com base no seu cargo atual e cargo desejado, com ações detalhadas e pesquisa guiada de mercado.</p>
+      <div id="planoAcao"></div>
+    </section>
   </div>
 
   <script>
@@ -66,114 +143,285 @@
     const tabelaBody = document.querySelector("#tabelaGaps tbody");
     const planoEl = document.getElementById("planoAcao");
 
-    function classeGap(gap){ if(gap >= 4) return ["Alta","gap-high"]; if(gap >= 2) return ["Média","gap-mid"]; return ["Baixa","gap-low"]; }
+    function detectArea(role) {
+      const r = (role || "").toLowerCase();
+      if (/rh|recursos humanos|people|gente/.test(r)) return "RH";
+      if (/marketing|growth|conteúdo|social/.test(r)) return "Marketing";
+      if (/vendas|comercial|account|negócios/.test(r)) return "Vendas";
+      if (/dev|desenvolvedor|engenheiro|software|dados|ti|tecnologia/.test(r)) return "Tecnologia";
+      if (/financeiro|controladoria|contábil|fp&a|tesouraria/.test(r)) return "Financeiro";
+      if (/produto|product/.test(r)) return "Produto";
+      if (/operaç|logíst|supply/.test(r)) return "Operações";
+      return "Geral";
+    }
 
-    function montarInputs(){
+    function detectLevel(role) {
+      const r = (role || "").toLowerCase();
+      if (/estagi|intern/.test(r)) return 1;
+      if (/junior|júnior/.test(r)) return 2;
+      if (/pleno/.test(r)) return 3;
+      if (/senior|sênior|especialista/.test(r)) return 4;
+      if (/coord/.test(r)) return 5;
+      if (/gerent|manager/.test(r)) return 6;
+      if (/diretor|head/.test(r)) return 7;
+      if (/ceo|cto|cfo|coo|vp/.test(r)) return 8;
+      return 3;
+    }
+
+    function areaActions(area) {
+      const base = {
+        "RH": ["Dominar indicadores de people analytics (turnover, eNPS, tempo de contratação).", "Conduzir 1 projeto de melhoria de recrutamento ou performance com KPI definido.", "Desenvolver rotina de feedback 1:1 e plano de desenvolvimento individual (PDI)."],
+        "Marketing": ["Construir dashboard com CAC, LTV, conversão e ROI por canal.", "Liderar experimento quinzenal de growth com hipótese, teste e aprendizado.", "Criar portfólio com 3 cases completos (objetivo, estratégia, resultado)."],
+        "Vendas": ["Aumentar previsibilidade de pipeline (taxa de conversão por etapa).", "Implementar rotina de revisão semanal de contas estratégicas.", "Treinar negociação consultiva e objeções com role-play gravado."],
+        "Tecnologia": ["Entregar projeto com qualidade (testes, revisão de código e documentação).", "Evoluir arquitetura/boas práticas e comunicar trade-offs técnicos ao negócio.", "Criar portfólio técnico (GitHub) com 2 projetos relevantes para o cargo alvo."],
+        "Financeiro": ["Aprimorar projeções e análises de variação com recomendações executivas.", "Automatizar relatórios recorrentes para reduzir esforço manual.", "Conduzir estudo de eficiência/custos com plano de ação financeiro."],
+        "Produto": ["Conduzir discovery com usuários e priorização baseada em impacto.", "Lançar 1 melhoria por ciclo com métrica de sucesso definida.", "Alinhar roadmap com objetivos de negócio e riscos mapeados."],
+        "Operações": ["Mapear gargalos e reduzir tempo de ciclo com Kaizen simples.", "Padronizar processos críticos com indicadores visuais.", "Implantar rotina de acompanhamento diário/semanal com SLA."],
+        "Geral": ["Mapear competências críticas do cargo desejado e comparar com seu perfil atual.", "Executar projeto de alto impacto com resultado mensurável.", "Construir presença profissional (portfólio, networking e posicionamento)."]
+      };
+      return base[area] || base["Geral"];
+    }
+
+    function classeGap(gap) {
+      if (gap >= 4) return ["Alta", "gap-high"];
+      if (gap >= 2) return ["Média", "gap-mid"];
+      return ["Baixa", "gap-low"];
+    }
+
+    function montarInputs() {
       dimensoesEl.innerHTML = "";
-      dimensoes.forEach((dim,i)=>{
+      dimensoes.forEach((dim, i) => {
         const field = document.createElement("div");
         field.className = "field";
-        field.innerHTML = `<label>${dim.nome}</label><div class="sliders"><div><span>Atual: <strong id="atualVal${i}">${dim.atual}</strong></span><input type="range" min="0" max="10" step="1" value="${dim.atual}" id="atual${i}" /></div><div><span>Desejado: <strong id="desVal${i}">${dim.desejado}</strong></span><input type="range" min="0" max="10" step="1" value="${dim.desejado}" id="des${i}" /></div></div>`;
+        field.innerHTML = `
+          <label>${dim.nome}</label>
+          <div class="sliders">
+            <div>
+              <span>Atual: <strong id="atualVal${i}">${dim.atual}</strong></span>
+              <input type="range" min="0" max="10" step="1" value="${dim.atual}" id="atual${i}" />
+            </div>
+            <div>
+              <span>Desejado: <strong id="desVal${i}">${dim.desejado}</strong></span>
+              <input type="range" min="0" max="10" step="1" value="${dim.desejado}" id="des${i}" />
+            </div>
+          </div>
+        `;
         dimensoesEl.appendChild(field);
-        field.querySelector(`#atual${i}`).addEventListener("input", (e)=>{ dimensoes[i].atual = Number(e.target.value); field.querySelector(`#atualVal${i}`).textContent = e.target.value; atualizarTudo(); });
-        field.querySelector(`#des${i}`).addEventListener("input", (e)=>{ dimensoes[i].desejado = Number(e.target.value); field.querySelector(`#desVal${i}`).textContent = e.target.value; atualizarTudo(); });
+
+        field.querySelector(`#atual${i}`).addEventListener("input", (e) => {
+          dimensoes[i].atual = Number(e.target.value);
+          field.querySelector(`#atualVal${i}`).textContent = e.target.value;
+          atualizarTudo();
+        });
+
+        field.querySelector(`#des${i}`).addEventListener("input", (e) => {
+          dimensoes[i].desejado = Number(e.target.value);
+          field.querySelector(`#desVal${i}`).textContent = e.target.value;
+          atualizarTudo();
+        });
       });
     }
 
-    function drawRadar(){
+    function drawRadar() {
       const canvas = document.getElementById("radarChart");
       const ctx = canvas.getContext("2d");
-      const {width, height} = canvas;
-      ctx.clearRect(0,0,width,height);
+      const { width, height } = canvas;
+      ctx.clearRect(0, 0, width, height);
 
-      const cx = width/2, cy = height/2, maxR = Math.min(width, height)*0.35;
+      const cx = width / 2, cy = height / 2, maxR = Math.min(width, height) * 0.33;
       const n = dimensoes.length;
-      const angleStep = (Math.PI*2)/n;
+      const step = (Math.PI * 2) / n;
 
-      // grade
       ctx.strokeStyle = "#d1d5db";
-      for(let level=1; level<=5; level++){
-        const r = (maxR/5)*level;
+      for (let lv = 1; lv <= 5; lv++) {
+        const r = (maxR / 5) * lv;
         ctx.beginPath();
-        for(let i=0;i<n;i++){
-          const ang = -Math.PI/2 + i*angleStep;
-          const x = cx + Math.cos(ang)*r;
-          const y = cy + Math.sin(ang)*r;
-          i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+        for (let i = 0; i < n; i++) {
+          const a = -Math.PI / 2 + i * step;
+          const x = cx + Math.cos(a) * r;
+          const y = cy + Math.sin(a) * r;
+          i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
         }
-        ctx.closePath();
-        ctx.stroke();
+        ctx.closePath(); ctx.stroke();
       }
 
-      // eixos + labels
       ctx.font = "11px sans-serif";
       ctx.fillStyle = "#374151";
-      dimensoes.forEach((d,i)=>{
-        const ang = -Math.PI/2 + i*angleStep;
-        const x = cx + Math.cos(ang)*maxR;
-        const y = cy + Math.sin(ang)*maxR;
-        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
+      for (let i = 0; i < n; i++) {
+        const a = -Math.PI / 2 + i * step;
+        const x = cx + Math.cos(a) * maxR;
+        const y = cy + Math.sin(a) * maxR;
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+        const label = dimensoes[i].nome.length > 22 ? dimensoes[i].nome.slice(0, 22) + "…" : dimensoes[i].nome;
+        ctx.fillText(label, cx + Math.cos(a) * (maxR + 16) - 24, cy + Math.sin(a) * (maxR + 16));
+      }
 
-        const lx = cx + Math.cos(ang)*(maxR+18);
-        const ly = cy + Math.sin(ang)*(maxR+18);
-        const label = d.nome.length > 22 ? d.nome.slice(0,22)+"…" : d.nome;
-        ctx.fillText(label, lx-30, ly);
-      });
-
-      function plot(data, stroke, fill){
+      function plot(values, stroke, fill) {
         ctx.beginPath();
-        data.forEach((v,i)=>{
-          const ang = -Math.PI/2 + i*angleStep;
-          const r = (v/10)*maxR;
-          const x = cx + Math.cos(ang)*r;
-          const y = cy + Math.sin(ang)*r;
-          i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+        values.forEach((v, i) => {
+          const a = -Math.PI / 2 + i * step;
+          const r = (v / 10) * maxR;
+          const x = cx + Math.cos(a) * r;
+          const y = cy + Math.sin(a) * r;
+          i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
         });
         ctx.closePath();
-        ctx.strokeStyle = stroke; ctx.fillStyle = fill; ctx.lineWidth = 2; ctx.stroke(); ctx.fill();
+        ctx.strokeStyle = stroke;
+        ctx.fillStyle = fill;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fill();
       }
-      plot(dimensoes.map(d=>d.atual), "#2563eb", "rgba(37,99,235,.2)");
-      plot(dimensoes.map(d=>d.desejado), "#059669", "rgba(5,150,105,.2)");
 
-      // legenda
-      ctx.fillStyle="#2563eb"; ctx.fillRect(20,20,12,12); ctx.fillStyle="#111827"; ctx.fillText("Estado Atual", 38, 30);
-      ctx.fillStyle="#059669"; ctx.fillRect(140,20,12,12); ctx.fillStyle="#111827"; ctx.fillText("Estado Desejado", 158, 30);
+      plot(dimensoes.map(d => d.atual), "#2563eb", "rgba(37,99,235,.2)");
+      plot(dimensoes.map(d => d.desejado), "#059669", "rgba(5,150,105,.2)");
+
+      ctx.fillStyle = "#2563eb"; ctx.fillRect(16, 16, 12, 12);
+      ctx.fillStyle = "#111827"; ctx.fillText("Estado Atual", 34, 26);
+      ctx.fillStyle = "#059669"; ctx.fillRect(130, 16, 12, 12);
+      ctx.fillStyle = "#111827"; ctx.fillText("Estado Desejado", 148, 26);
     }
 
-    function montarTabelaGaps(){
-      tabelaBody.innerHTML="";
-      const ordenado=[...dimensoes].map(d=>({...d,gap:Math.max(0,d.desejado-d.atual)})).sort((a,b)=>b.gap-a.gap);
-      ordenado.forEach(item=>{
+    function montarTabelaGaps() {
+      tabelaBody.innerHTML = "";
+      const ordenado = [...dimensoes]
+        .map(d => ({ ...d, gap: Math.max(0, d.desejado - d.atual) }))
+        .sort((a, b) => b.gap - a.gap);
+
+      ordenado.forEach(item => {
         const [txt, cls] = classeGap(item.gap);
-        const tr=document.createElement("tr");
-        tr.innerHTML=`<td>${item.nome}</td><td>${item.atual}</td><td>${item.desejado}</td><td>${item.gap}</td><td><span class="badge ${cls}">${txt}</span></td>`;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${item.nome}</td><td>${item.atual}</td><td>${item.desejado}</td><td>${item.gap}</td><td><span class="badge ${cls}">${txt}</span></td>`;
         tabelaBody.appendChild(tr);
       });
       return ordenado;
     }
 
-    function montarPlanoAcao(top3){
-      planoEl.innerHTML="";
-      const cargoAtual=document.getElementById("cargoAtual").value || "Cargo atual não informado";
-      const cargoDesejado=document.getElementById("cargoDesejado").value || "Cargo desejado não informado";
-      const ativos = top3.filter(d=>d.gap>0);
-      if(!ativos.length){ planoEl.innerHTML = '<p class="small">Parabéns! Não há gap positivo no momento. Mantenha rotina mensal de revisão.</p>'; return; }
-      ativos.forEach((d,index)=>{
-        const bloco=document.createElement("div");
-        bloco.className="field";
-        bloco.innerHTML=`<h3>${index+1}. ${d.nome} (Gap ${d.gap})</h3><p><strong>Meta SMART:</strong> Em 90 dias, elevar <em>${d.nome}</em> de ${d.atual} para ao menos ${Math.min(d.atual+2,d.desejado)} com evidências objetivas.</p><p><strong>5W2H:</strong><br><strong>What:</strong> Executar 2 ações semanais ligadas à dimensão.<br><strong>Why:</strong> Reduzir distância entre ${cargoAtual} e ${cargoDesejado}.<br><strong>Where:</strong> Trabalho atual + networking + cursos online.<br><strong>When:</strong> Revisão semanal e checkpoint mensal.<br><strong>Who:</strong> Você + mentor(a)/líder + parceiro de responsabilização.<br><strong>How:</strong> Microtarefas de 30-45 min registradas no calendário.<br><strong>How much:</strong> Recursos gratuitos ou até R$150/mês.</p>`;
-        planoEl.appendChild(bloco);
+    function montarPlanoAcao(top3) {
+      planoEl.innerHTML = "";
+      const cargoAtual = document.getElementById("cargoAtual").value.trim() || "Cargo atual não informado";
+      const cargoDesejado = document.getElementById("cargoDesejado").value.trim() || "Cargo desejado não informado";
+      const area = detectArea(`${cargoAtual} ${cargoDesejado}`);
+      const nivelAtual = detectLevel(cargoAtual);
+      const nivelDesejado = detectLevel(cargoDesejado);
+      const degrau = Math.max(0, nivelDesejado - nivelAtual);
+      const acoesBase = areaActions(area);
+      const ativos = top3.filter(d => d.gap > 0);
+
+      if (!ativos.length) {
+        planoEl.innerHTML = `<p class="small">Parabéns! No momento você não tem gaps positivos. Faça revisão mensal para manter evolução.</p>`;
+        return;
+      }
+
+      ativos.forEach((d, idx) => {
+        const extra = degrau >= 2
+          ? "Inclua mentoria quinzenal e projeto de visibilidade para acelerar mudança de senioridade."
+          : "Foque em consistência de execução e evidências de resultado mês a mês.";
+
+        const query = encodeURIComponent(`${cargoAtual} para ${cargoDesejado} competências salário responsabilidades`);
+        const linksPesquisa = `
+          <div class="links">
+            <a target="_blank" href="https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(cargoDesejado)}">Vagas no LinkedIn</a>
+            <a target="_blank" href="https://www.glassdoor.com.br/Vaga/index.htm?k=${encodeURIComponent(cargoDesejado)}">Faixa salarial (Glassdoor)</a>
+            <a target="_blank" href="https://www.google.com/search?q=${query}">Pesquisa detalhada no Google</a>
+          </div>`;
+
+        const card = document.createElement("div");
+        card.className = "plan-card";
+        card.innerHTML = `
+          <h3>${idx + 1}. ${d.nome} (Gap ${d.gap})</h3>
+          <div class="plan-meta">
+            <div><strong>Transição analisada:</strong> ${cargoAtual} → ${cargoDesejado}</div>
+            <div><strong>Área detectada:</strong> ${area} | <strong>Salto de senioridade:</strong> ${degrau} nível(is)</div>
+          </div>
+
+          <div class="plan-block">
+            <strong>Meta SMART (90 dias):</strong>
+            <ul>
+              <li>Elevar <em>${d.nome}</em> de ${d.atual} para no mínimo ${Math.min(d.atual + 2, d.desejado)}.</li>
+              <li>Entregar evidências: 1 projeto com resultado + feedback formal + atualização de currículo/LinkedIn.</li>
+            </ul>
+          </div>
+
+          <div class="plan-block">
+            <strong>Ações detalhadas por cargo (pesquisa guiada):</strong>
+            <ul>
+              <li>${acoesBase[0]}</li>
+              <li>${acoesBase[1]}</li>
+              <li>${acoesBase[2]}</li>
+              <li>${extra}</li>
+            </ul>
+            ${linksPesquisa}
+          </div>
+
+          <div class="plan-block">
+            <strong>5W2H:</strong>
+            <ul>
+              <li><strong>What:</strong> 2 ações semanais + 1 entrega mensal ligada a ${d.nome}.</li>
+              <li><strong>Why:</strong> reduzir distância entre ${cargoAtual} e ${cargoDesejado}.</li>
+              <li><strong>Where:</strong> trabalho atual + projetos paralelos + networking.</li>
+              <li><strong>When:</strong> revisão semanal e checkpoint mensal.</li>
+              <li><strong>Who:</strong> você + líder/mentor + parceiro de accountability.</li>
+              <li><strong>How:</strong> blocos de 45 min no calendário com registro de evidências.</li>
+              <li><strong>How much:</strong> foco em recursos gratuitos e até R$150/mês.</li>
+            </ul>
+          </div>
+        `;
+        planoEl.appendChild(card);
       });
     }
 
-    function atualizarTudo(){ drawRadar(); const ordenado=montarTabelaGaps(); montarPlanoAcao(ordenado.slice(0,3)); }
+    function atualizarTudo() {
+      drawRadar();
+      const ordenado = montarTabelaGaps();
+      montarPlanoAcao(ordenado.slice(0, 3));
+    }
 
-    document.getElementById("btnResetar").addEventListener("click", ()=>{ dimensoes=JSON.parse(JSON.stringify(dimensoesBase)); montarInputs(); atualizarTudo(); });
-    document.getElementById("btnExportar").addEventListener("click", ()=>{
-      const payload={ cargoAtual:document.getElementById("cargoAtual").value, cargoDesejado:document.getElementById("cargoDesejado").value, dimensoes:dimensoes.map(d=>({...d,gap:Math.max(0,d.desejado-d.atual)})), geradoEm:new Date().toISOString() };
-      const blob=new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
-      const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download="plano_carreira.json"; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    document.getElementById("cargoAtual").addEventListener("input", atualizarTudo);
+    document.getElementById("cargoDesejado").addEventListener("input", atualizarTudo);
+
+    document.getElementById("btnResetar").addEventListener("click", () => {
+      dimensoes = JSON.parse(JSON.stringify(dimensoesBase));
+      document.getElementById("cargoAtual").value = "";
+      document.getElementById("cargoDesejado").value = "";
+      montarInputs();
+      atualizarTudo();
     });
+
+    document.getElementById("btnExportar").addEventListener("click", () => {
+      const payload = {
+        cargoAtual: document.getElementById("cargoAtual").value,
+        cargoDesejado: document.getElementById("cargoDesejado").value,
+        dimensoes: dimensoes.map(d => ({ ...d, gap: Math.max(0, d.desejado - d.atual) })),
+        geradoEm: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "plano_carreira.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("btnExportarCSV").addEventListener("click", () => {
+      const cabecalho = "Dimensão,Atual,Desejado,Gap\n";
+      const linhas = dimensoes
+        .map(d => `"${d.nome}",${d.atual},${d.desejado},${Math.max(0, d.desejado - d.atual)}`)
+        .join("\n");
+
+      const info = `\n\n"Cargo Atual","${(document.getElementById("cargoAtual").value || "").replaceAll('"', '""')}"\n"Cargo Desejado","${(document.getElementById("cargoDesejado").value || "").replaceAll('"', '""')}"\n`;
+      const csv = cabecalho + linhas + info;
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "plano_carreira.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("btnExportarPDF").addEventListener("click", () => window.print());
 
     montarInputs();
     atualizarTudo();
