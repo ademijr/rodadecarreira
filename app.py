@@ -1,219 +1,216 @@
-
 import streamlit as st
-import pandas as pd
-import numpy as np
 import plotly.graph_objects as go
-from pathlib import Path
+import pandas as pd
 
-# Configuração da página
 st.set_page_config(
-    page_title="Roda da Carreira - Análise Profissional",
-    page_icon="📊",
+    page_title="Ecossistema Pessoas com IA",
+    page_icon="🚀",
     layout="wide"
 )
 
-# Título e introdução
-st.title("🎯 Roda da Carreira - Análise Profissional")
-st.markdown("""
-Esta ferramenta ajudará você a avaliar sua situação profissional atual e definir seus objetivos de carreira.
-Preencha os campos abaixo com valores de 0 a 10 para cada dimensão.
-""")
+st.title("🚀 Ecossistema Pessoas com IA")
+st.caption("Portfólio estratégico: sobre você, agentes GPT, soluções e ferramentas de evolução profissional.")
 
-# Dimensões da carreira
-dimensoes = [
-    'Desenvolvimento Profissional / Aprendizado',
-    'Satisfação / Felicidade no Trabalho',
-    'Equilíbrio Vida Pessoal e Trabalho',
-    'Reconhecimento',
-    'Recompensa (salário + benefícios)',
-    'Perspectiva de Crescimento de Carreira',
-    'Relacionamentos Profissionais',
-    'Autonomia e Controle',
-    'Alinhamento com Propósito Pessoal'
-]
+aba_sobre, aba_caixa, aba_sites, aba_roda = st.tabs([
+    "🙋 Sobre mim",
+    "🧰 Caixa de Ferramentas",
+    "🌐 Meus Sites",
+    "📊 Roda da Carreira"
+])
 
-# Criar duas colunas para informações do cargo
-col1, col2 = st.columns(2)
-with col1:
-    cargo_atual = st.text_input("Cargo Atual")
-with col2:
-    cargo_desejado = st.text_input("Cargo Desejado")
+with aba_sobre:
+    st.header("Quem sou eu")
+    st.markdown(
+        """
+        Sou um profissional focado em **carreira, empregabilidade e produtividade com IA**, com uma proposta clara:
+        transformar tecnologia em resultados práticos para pessoas reais.
 
-# Criar containers para as avaliações
-st.markdown("### Avaliação das Dimensões")
+        Minha atuação combina:
+        - **Diagnóstico de carreira** para identificar gargalos e oportunidades.
+        - **Automação com IA** para acelerar tarefas críticas (currículo, candidaturas, plano de ação).
+        - **Estratégia profissional** para posicionamento e conquista de vagas.
 
-# Dicionário para armazenar os valores
-valores = {'atual': {}, 'desejado': {}}
+        ### Missão
+        Ajudar pessoas a saírem da estagnação profissional e alcançarem uma trajetória mais clara, competitiva e sustentável.
 
-# Criar sliders para cada dimensão
-for dim in dimensoes:
-    st.markdown(f"#### {dim}")
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.markdown("**Estado Atual**")
-        valores['atual'][dim] = st.slider(
-            f"Atual - {dim}",
-            0, 10, 5,
-            key=f"atual_{dim}",
-            help=f"Avalie sua situação atual em relação a {dim}"
-        )
-
-    with col2:
-        st.markdown("**Estado Desejado**")
-        valores['desejado'][dim] = st.slider(
-            f"Desejado - {dim}",
-            0, 10, 8,
-            key=f"desejado_{dim}",
-            help=f"Defina seu objetivo para {dim}"
-        )
-
-    # Adicionar descrição dos níveis
-    st.markdown("""
-    **Guia de Avaliação:**
-    - 0-2: Nível crítico/insatisfatório
-    - 3-4: Nível baixo/necessita melhorias significativas
-    - 5-6: Nível médio/adequado com espaço para melhorias
-    - 7-8: Nível bom/satisfatório
-    - 9-10: Nível excelente/excepcional
-    """)
-    st.markdown("---")
-
-# Botão para gerar análise
-if st.button("Gerar Análise"):
-    # Criar gráfico radar com Plotly
-    fig = go.Figure()
-
-    # Adicionar o primeiro valor novamente para fechar o polígono
-    dimensoes_plot = dimensoes + [dimensoes[0]]
-    valores_atual = [valores['atual'][dim] for dim in dimensoes] + [valores['atual'][dimensoes[0]]]
-    valores_desejado = [valores['desejado'][dim] for dim in dimensoes] + [valores['desejado'][dimensoes[0]]]
-
-    # Adicionar traces
-    fig.add_trace(go.Scatterpolar(
-        r=valores_atual,
-        theta=dimensoes_plot,
-        fill='toself',
-        name='Estado Atual',
-        line_color='#FF6B6B'
-    ))
-
-    fig.add_trace(go.Scatterpolar(
-        r=valores_desejado,
-        theta=dimensoes_plot,
-        fill='toself',
-        name='Estado Desejado',
-        line_color='#4ECDC4'
-    ))
-
-    # Atualizar layout
-    fig.update_layout(
-        polar=dict(
-            radialaxis=dict(
-                visible=True,
-                range=[0, 10]
-            )
-        ),
-        showlegend=True,
-        title="Análise da Roda da Carreira"
+        ### Diferenciais
+        - Linguagem simples e aplicada.
+        - Foco em execução (não só teoria).
+        - Soluções modulares que se conectam em um ecossistema.
+        """
     )
 
-    # Mostrar o gráfico
-    st.plotly_chart(fig, use_container_width=True)
+with aba_caixa:
+    st.header("Índice das minhas soluções (Agentes GPT)")
 
-    # Análise dos gaps
-    st.markdown("### Análise Detalhada e Plano de Desenvolvimento")
+    agentes = [
+        {
+            "nome": "Agente Diagnóstico NR1",
+            "descricao": "Realiza um raio-X da situação profissional atual e organiza os principais bloqueios em prioridades de ação.",
+            "praticas": [
+                "Mapear lacunas de competências para o cargo desejado.",
+                "Identificar padrões que estão travando entrevistas.",
+                "Transformar inseguranças em plano de melhoria semanal.",
+                "Gerar um checklist de evolução em 30, 60 e 90 dias.",
+                "Criar indicadores de progresso para acompanhar mudanças."
+            ],
+            "link": "https://diagnosticonr1.pessoascomia.com/"
+        },
+        {
+            "nome": "Agente Gera Currículo",
+            "descricao": "Converte experiências e resultados em um currículo orientado a vagas, com maior clareza, impacto e aderência.",
+            "praticas": [
+                "Criar versão-base do currículo a partir de histórico bruto.",
+                "Adaptar currículo para vagas específicas em minutos.",
+                "Reescrever conquistas com foco em métricas e impacto.",
+                "Ajustar resumo profissional por senioridade.",
+                "Preparar versões para áreas diferentes mantendo consistência."
+            ],
+            "link": "https://geracurriculo.pessoascomia.com/"
+        },
+        {
+            "nome": "Agente Quero Vaga de Emprego",
+            "descricao": "Apoia a estratégia de candidatura: seleção de vagas, personalização de mensagens e consistência no funil de aplicação.",
+            "praticas": [
+                "Definir meta semanal de candidaturas qualificadas.",
+                "Produzir mensagem de abordagem para recrutadores.",
+                "Montar rotina de follow-up sem parecer invasivo.",
+                "Priorizar vagas com maior chance de match.",
+                "Estruturar narrativa para entrevistas por tipo de vaga."
+            ],
+            "link": "https://querovagadeemprego.pessoascomia.com/"
+        },
+        {
+            "nome": "Agente Dash NR1",
+            "descricao": "Consolida dados e métricas da jornada profissional em painéis para tomada de decisão rápida.",
+            "praticas": [
+                "Acompanhar evolução de competências por período.",
+                "Monitorar taxa de resposta das candidaturas.",
+                "Comparar desempenho entre versões de currículo.",
+                "Visualizar gargalos no funil (aplicação → entrevista → proposta).",
+                "Apoiar ajustes estratégicos com base em evidências."
+            ],
+            "link": "https://dashnr1.pessoascomia.com/"
+        },
+    ]
 
-    gaps = {dim: valores['desejado'][dim] - valores['atual'][dim] for dim in dimensoes}
-    maiores_gaps = sorted(gaps.items(), key=lambda x: x[1], reverse=True)
+    for idx, ag in enumerate(agentes, start=1):
+        with st.container(border=True):
+            st.subheader(f"{idx}. {ag['nome']}")
+            st.markdown(f"**Descrição detalhada:** {ag['descricao']}")
+            st.markdown("**5 possibilidades práticas:**")
+            for i, item in enumerate(ag["praticas"], start=1):
+                st.markdown(f"{i}. {item}")
+            st.link_button("Acessar agente", ag["link"])
 
-    for dim, gap in maiores_gaps:
-        if gap > 0:  # Só mostrar dimensões com gap positivo
-            st.markdown(f"#### {dim} (Gap: {gap})")
+with aba_sites:
+    st.header("Meus sites e descritivo detalhado")
+    st.info(
+        "Os descritivos abaixo foram estruturados para uso comercial, onboarding de clientes e posicionamento digital do seu ecossistema."
+    )
 
-            # Análise personalizada baseada no estado atual e gap
-            atual = valores['atual'][dim]
-            desejado = valores['desejado'][dim]
+    sites = [
+        {
+            "nome": "Gera Currículo",
+            "url": "https://geracurriculo.pessoascomia.com/",
+            "descricao": "Plataforma orientada à criação e otimização de currículos com foco em empregabilidade. A proposta central é converter experiências em valor percebido pelo recrutador, com linguagem objetiva e aderente às exigências de mercado.",
+            "valor": [
+                "Clareza de posicionamento profissional.",
+                "Aumento da qualidade das candidaturas.",
+                "Padronização e rapidez na atualização do currículo.",
+            ],
+        },
+        {
+            "nome": "Diagnóstico NR1",
+            "url": "https://diagnosticonr1.pessoascomia.com/",
+            "descricao": "Ferramenta de diagnóstico estratégico que identifica nível atual de carreira, obstáculos críticos e prioridades de evolução. Atua como etapa inicial para construção de um plano de desenvolvimento consistente.",
+            "valor": [
+                "Visão estruturada dos gaps profissionais.",
+                "Direcionamento prático para próximas ações.",
+                "Base analítica para decisões de transição de carreira.",
+            ],
+        },
+        {
+            "nome": "Quero Vaga de Emprego",
+            "url": "https://querovagadeemprego.pessoascomia.com/",
+            "descricao": "Ambiente focado em execução da busca por emprego: escolha de vagas, personalização de aplicação e rotina disciplinada de acompanhamento. Ideal para transformar intenção em pipeline real de oportunidades.",
+            "valor": [
+                "Mais foco na candidatura certa.",
+                "Melhor taxa de resposta em processos seletivos.",
+                "Organização completa da jornada de aplicação.",
+            ],
+        },
+        {
+            "nome": "Dash NR1",
+            "url": "https://dashnr1.pessoascomia.com/",
+            "descricao": "Dashboard de desempenho profissional com indicadores da jornada de carreira. Permite leitura rápida de resultados, comparação entre ciclos e melhoria contínua baseada em dados.",
+            "valor": [
+                "Tomada de decisão com métricas.",
+                "Acompanhamento de evolução ao longo do tempo.",
+                "Visibilidade de gargalos e oportunidades de otimização.",
+            ],
+        },
+    ]
 
-            st.markdown(f"""
-            **Situação Atual ({atual}/10):**
-            {get_situacao_atual(dim, atual)}
+    for site in sites:
+        with st.container(border=True):
+            st.subheader(site["nome"])
+            st.markdown(site["descricao"])
+            st.markdown("**Principais entregas de valor:**")
+            for v in site["valor"]:
+                st.markdown(f"- {v}")
+            st.link_button("Visitar site", site["url"])
 
-            **Objetivo ({desejado}/10):**
-            {get_objetivo(dim, desejado)}
+with aba_roda:
+    st.header("Roda da Carreira")
+    st.markdown("Avalie seu estado atual e desejado em cada dimensão para criar um plano de desenvolvimento profissional.")
 
-            **Análise do Gap:**
-            {get_analise_gap(dim, gap)}
+    dimensoes = [
+        'Desenvolvimento Profissional / Aprendizado',
+        'Satisfação / Felicidade no Trabalho',
+        'Equilíbrio Vida Pessoal e Trabalho',
+        'Reconhecimento',
+        'Recompensa (salário + benefícios)',
+        'Perspectiva de Crescimento de Carreira',
+        'Relacionamentos Profissionais',
+        'Autonomia e Controle',
+        'Alinhamento com Propósito Pessoal'
+    ]
 
-            **Plano de Desenvolvimento:**
+    col1, col2 = st.columns(2)
+    with col1:
+        cargo_atual = st.text_input("Cargo Atual")
+    with col2:
+        cargo_desejado = st.text_input("Cargo Desejado")
 
-            *Ações Imediatas (30 dias):*
-            {get_acoes_imediatas(dim, atual, desejado)}
+    valores = {'atual': {}, 'desejado': {}}
 
-            *Médio Prazo (90 dias):*
-            {get_acoes_medio_prazo(dim, atual, desejado)}
+    for dim in dimensoes:
+        st.markdown(f"#### {dim}")
+        c1, c2 = st.columns(2)
+        with c1:
+            valores['atual'][dim] = st.slider(f"Atual - {dim}", 0, 10, 5, key=f"a_{dim}")
+        with c2:
+            valores['desejado'][dim] = st.slider(f"Desejado - {dim}", 0, 10, 8, key=f"d_{dim}")
 
-            *Longo Prazo (180 dias):*
-            {get_acoes_longo_prazo(dim, atual, desejado)}
+    if st.button("Gerar Análise"):
+        fig = go.Figure()
+        dims_plot = dimensoes + [dimensoes[0]]
+        atual = [valores['atual'][d] for d in dimensoes] + [valores['atual'][dimensoes[0]]]
+        desejado = [valores['desejado'][d] for d in dimensoes] + [valores['desejado'][dimensoes[0]]]
 
-            **Métricas de Sucesso:**
-            {get_metricas_sucesso(dim)}
+        fig.add_trace(go.Scatterpolar(r=atual, theta=dims_plot, fill='toself', name='Estado Atual', line_color='#FF6B6B'))
+        fig.add_trace(go.Scatterpolar(r=desejado, theta=dims_plot, fill='toself', name='Estado Desejado', line_color='#4ECDC4'))
+        fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 10])), showlegend=True)
+        st.plotly_chart(fig, use_container_width=True)
 
-            **Recursos Recomendados:**
-            {get_recursos_recomendados(dim)}
-            """)
-            st.markdown("---")
+        gaps = {d: valores['desejado'][d] - valores['atual'][d] for d in dimensoes}
+        df = pd.DataFrame({
+            "Dimensão": dimensoes,
+            "Atual": [valores['atual'][d] for d in dimensoes],
+            "Desejado": [valores['desejado'][d] for d in dimensoes],
+            "Gap": [gaps[d] for d in dimensoes],
+        }).sort_values("Gap", ascending=False)
 
-    # Salvar dados
-    if st.button("Exportar Análise"):
-        dados = {
-            'Dimensão': dimensoes,
-            'Estado Atual': [valores['atual'][dim] for dim in dimensoes],
-            'Estado Desejado': [valores['desejado'][dim] for dim in dimensoes],
-            'Gap': [gaps[dim] for dim in dimensoes]
-        }
-        df = pd.DataFrame(dados)
-        df.to_csv('analise_carreira.csv', index=False)
-        st.success("Análise exportada com sucesso!")
-
-# Funções de análise personalizada
-def get_situacao_atual(dimensao, valor):
-    # Implementar análises personalizadas para cada dimensão e valor
-    return "Análise detalhada da situação atual baseada na dimensão e valor"
-
-def get_objetivo(dimensao, valor):
-    return "Descrição do objetivo ideal baseado na dimensão e valor desejado"
-
-def get_analise_gap(dimensao, gap):
-    return "Análise detalhada do gap e suas implicações"
-
-def get_acoes_imediatas(dimensao, atual, desejado):
-    return "Lista de ações específicas para os primeiros 30 dias"
-
-def get_acoes_medio_prazo(dimensao, atual, desejado):
-    return "Lista de ações para os próximos 90 dias"
-
-def get_acoes_longo_prazo(dimensao, atual, desejado):
-    return "Lista de ações para os próximos 180 dias"
-
-def get_metricas_sucesso(dimensao):
-    return "Lista de métricas específicas para medir o progresso"
-
-def get_recursos_recomendados(dimensao):
-    return "Lista de recursos, cursos, livros e ferramentas recomendadas"
-
-# Adicionar informações de ajuda
-with st.expander("📖 Como usar esta ferramenta"):
-    st.markdown("""
-    1. **Preencha seu cargo atual e desejado**
-    2. **Avalie cada dimensão:**
-       - Estado Atual (0-10): Como você se sente hoje
-       - Estado Desejado (0-10): Onde você quer chegar
-    3. **Clique em 'Gerar Análise'** para ver o gráfico e recomendações
-    4. **Exporte os resultados** para acompanhamento futuro
-
-    **Dicas para avaliação:**
-    - Seja honesto em suas avaliações
-    - Considere suas experiências nos últimos 3-6 meses
-    - Pense em exemplos concretos para justificar cada nota
-    """)
+        st.markdown("### Priorização de Gaps")
+        st.dataframe(df, use_container_width=True)
